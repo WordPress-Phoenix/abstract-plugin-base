@@ -1,6 +1,12 @@
 <?php
-// TODO: move to packagist and build in composer
-if ( ! class_exists( 'FanSided_Powertools' ) ) {
+/**
+ * Plugin_Base Class for WordPress Plugins
+ * @author : Seth Carstens
+ * @package: abtract-plugin-base
+ * @version: 1.0.1
+ * @license: GPL 2.0 - please retain comments that express original build of this file by the author.
+ */
+if ( ! class_exists( 'Plugin_Base' ) ) {
 	/**
 	 * Class Plugin_Base
 	 */
