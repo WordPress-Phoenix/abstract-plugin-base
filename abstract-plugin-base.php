@@ -1,9 +1,10 @@
 <?php
 /**
  * Plugin_Base Class for WordPress Plugins
+ *
  * @author : Seth Carstens
  * @package: abtract-plugin-base
- * @version: 1.0.1
+ * @version: 1.0.2
  * @license: GPL 2.0 - please retain comments that express original build of this file by the author.
  */
 if ( ! class_exists( 'Plugin_Base' ) ) {
@@ -20,7 +21,7 @@ if ( ! class_exists( 'Plugin_Base' ) ) {
 		public $network;
 		public $current_blog_globals;
 		public $detect;
-		public $autoload_dir = '/includes/';
+		public $autoload_dir = [ '/includes/' ];
 		protected $current_file = __FILE__;
 		
 		/**
@@ -91,14 +92,16 @@ if ( ! class_exists( 'Plugin_Base' ) ) {
 		 *
 		 * @return  void
 		 */
-		public static function activate(){}
+		public static function activate() {
+		}
 		
 		/**
 		 * Deactivated the plugin actions
 		 *
 		 * @return  void
 		 */
-		public static function deactivate(){}
+		public static function deactivate() {
+		}
 		
 		abstract protected function defines_and_globals();
 		
@@ -118,8 +121,10 @@ if ( ! class_exists( 'Plugin_Base' ) ) {
 		 * @return string
 		 */
 		private function get_file_name_from_class( $class ) {
+			$filtered_class_name = explode( '\\', $class );
+			$class_filename      = end( $filtered_class_name );
 			
-			return 'class-' . str_replace( '_', '-', $class ) . '.php';
+			return 'class-' . str_replace( '_', '-', $class_filename ) . '.php';
 		}
 		
 		/**
@@ -149,7 +154,13 @@ if ( ! class_exists( 'Plugin_Base' ) ) {
 		public function autoload( $class ) {
 			$class = strtolower( $class );
 			$file  = $this->get_file_name_from_class( $class );
-			$this->load_file( $this->installed_dir . $this->autoload_dir . $file );
+			if ( ! is_array( $this->autoload_dir ) ) {
+				$this->load_file( $this->installed_dir . $this->autoload_dir . $file );
+			} else {
+				foreach ( $this->autoload_dir as $dir ) {
+					$this->load_file( $this->installed_dir . $dir . $file );
+				}
+			}
 		}
 		
 		public static function run() {
@@ -168,14 +179,16 @@ if ( ! class_exists( 'Plugin_Base' ) ) {
 		 * @param $instance
 		 */
 		private static function set( $instance = false ) {
-			// instantiate the plugin class, which should never be instantiated more then once
+			// make sure the plugin hasn't already been instantiated before
 			global $wp_plugins;
 			if ( ! isset( $wp_plugins ) ) {
 				$wp_plugins = new stdClass();
 			}
-			$plugin_name = strtolower( get_called_class() );
-			if ( empty( $instance ) || ! is_a( $instance, get_called_class() ) ) {
-				$wp_plugins->$plugin_name = new FanSided_Powertools();
+			// get the fully qualified parent class name and instantiate an instance of it
+			$called_class = get_called_class();
+			$plugin_name  = strtolower( $called_class );
+			if ( empty( $instance ) || ! is_a( $instance, $called_class ) ) {
+				$wp_plugins->$plugin_name = new $called_class();
 			} else {
 				$wp_plugins->$plugin_name = $instance;
 			}
