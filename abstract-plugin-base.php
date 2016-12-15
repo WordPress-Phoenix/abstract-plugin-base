@@ -4,7 +4,7 @@
  *
  * @author : Seth Carstens
  * @package: abtract-plugin-base
- * @version: 1.0.2
+ * @version: 1.0.3
  * @license: GPL 2.0 - please retain comments that express original build of this file by the author.
  */
 if ( ! class_exists( 'Plugin_Base' ) ) {
@@ -48,6 +48,7 @@ if ( ! class_exists( 'Plugin_Base' ) ) {
 			}
 			
 			// Onload to do things during plugin construction
+			$this->onload();
 			
 			// initialize
 			add_action( 'init', array( $this, 'init' ) );
