@@ -13,6 +13,13 @@ WordPress options builder class is a library that helps you setup theme or plugi
 
 ## Composer style (recommended)
 
+Via composer command line like
+```
+composer require WordPress-Phoenix/abstract-plugin-base && composer install
+```
+
+Or manually configuring the composer file like
+
 1. Include in your plugin by creating or adding the following to your composer.json file in the root of the plugin
 ```json
 {
@@ -66,18 +73,18 @@ if ( ! function_exists( 'add_filter' ) ) {
 // Hook initialization into the plugins_loaded action to maximize flexibility of hooks and filters
 add_action( 'plugins_loaded', array( 'Custom_Plugin', 'run' ) );
 
-// Enable Plugin Base for extending
-require_once "vendor/wordpress-phoenix/abstract-plugin-base/abstract-plugin-base.php";
+// Enable composer class libraries.
+require_once( 'vendor/autoload.php' );
 
 if ( ! class_exists( 'Custom_Plugin' ) ) {
 	/**
 	 * Class Custom_Plugin
 	 */
-	class Custom_Plugin extends Plugin_Base {
+	class Custom_Plugin extends \WPAZ_Plugin_Base\V_1_1\Plugin {
 		
 		protected $current_file = __FILE__;
 		
-		public function onload() {
+		public function onload( $instance ) {
 			// Nothing yet
 		} // END public function __construct
 		
@@ -93,6 +100,8 @@ if ( ! class_exists( 'Custom_Plugin' ) ) {
 		public function authenticated_init() {
 			if ( is_user_logged_in() ) {
 			    // Ready for wp-admin - but not required 
+			    //require_once( $this->installed_dir . '/admin/class-custom-plugin-admin.php' );
+                //$this->admin = new FanSided_Powertools_Admin( $this );
 			}
 		}
 		
