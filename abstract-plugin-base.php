@@ -98,7 +98,7 @@ abstract class Plugin {
 		}
 
 		// Onload to do things during plugin construction.
-		$this->onload();
+		$this->onload( $this );
 
 		// Most actions go into init which loads after WordPress core sets up all the defaults.
 		add_action( 'init', array( $this, 'init' ) );
@@ -114,10 +114,11 @@ abstract class Plugin {
 	/**
 	 * Initialize the plugin - for public (front end)
 	 *
+	 * @param mixed $instance Parent instance passed through to child.
 	 * @since   0.1
 	 * @return  void
 	 */
-	abstract public function onload();
+	abstract public function onload( $instance );
 
 	/**
 	 * Initialize the plugin - for public (front end)
