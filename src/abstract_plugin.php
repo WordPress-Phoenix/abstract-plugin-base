@@ -4,7 +4,7 @@
  *
  * @author  Seth Carstens
  * @package abtract-plugin-base
- * @version 1.1.2
+ * @version 1.1.3
  * @license GPL 2.0 - please retain comments that express original build of this file by the author.
  */
 
@@ -17,7 +17,7 @@ namespace WPAZ_Plugin_Base\V_1_1;
 /**
  * Class Plugin_Base
  */
-abstract class Plugin {
+abstract class Abstract_Plugin {
 	/**
 	 * Turn debugging on or off
 	 *
@@ -41,8 +41,8 @@ abstract class Plugin {
 
 	/**
 	 * Used to hold an instance of the admin object related to the plugin.
-	 *
-	 * @var null|\stdClass|Plugin $admin
+
+	 * @var null|\stdClass|Abstract_Plugin $admin
 	 */
 	public $admin;
 
@@ -242,8 +242,8 @@ abstract class Plugin {
 
 	/**
 	 * Used to get the instance of the class as an unforced singleton model
-	 *
-	 * @return bool|Plugin|mixed $instance
+
+	 * @return bool|Abstract_Plugin|mixed $instance
 	 */
 	public function get() {
 		global $wp_plugins;
@@ -258,8 +258,9 @@ abstract class Plugin {
 
 	/**
 	 * Used to setup the instance of the class and place in wp_plugins collection.
+
 	 *
-	 * @param bool|Plugin|mixed $instance Contains object representing the plugin.
+*@param bool|Abstract_Plugin|mixed $instance Contains object representing the plugin.
 	 */
 	private static function set( $instance = false ) {
 		// Make sure the plugin hasn't already been instantiated before.

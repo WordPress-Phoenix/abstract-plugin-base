@@ -1,3 +1,6 @@
+#### 1.1.3
+* Fixed filename to follow PSR-4 standard requirement
+
 #### 1.1.2
 * Fixed / moved main plugin file into src/
 
