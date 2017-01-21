@@ -1,3 +1,6 @@
+#### 1.1.2
+* Fixed / moved main plugin file into src/
+
 #### 1.1.1
 * Introduced namespaced version to handle problems with composer in WordPress plugins
 * Removed some parts of the class that were not generic enough for this class
