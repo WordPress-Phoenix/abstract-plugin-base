@@ -13,6 +13,8 @@ WordPress options builder class is a library that helps you setup theme or plugi
 
 ## Composer style (recommended)
 
+Information about installing and using Composer: [https://getcomposer.org/doc/00-intro.md](https://getcomposer.org/doc/00-intro.md). If you've already got brew, you can install Composer by running `brew install homebrew/php/composer`, or alternatively you can use composer inside of VVV. 
+
 Via composer command line: 
 ```
 composer require WordPress-Phoenix/abstract-plugin-base && composer install
