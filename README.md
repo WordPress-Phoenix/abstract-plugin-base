@@ -24,7 +24,7 @@ Or manually configuring the composer file like
 ```json
 {
   "require": {
-    "WordPress-Phoenix/abstract-plugin-base": "1.*"
+    "WordPress-Phoenix/abstract-plugin-base": "2.*"
   }
 }
 ```
@@ -55,8 +55,9 @@ features include:
 - Assists developers new to WordPress plugin development in file / folder architecture.
 - By starting all your plugins with the same architecture, we create a standard thats better for the dev community.
 
-## Simplist example of the main plugin file
+## Simplist example of the main plugin file, and required plugin class file
 
+custom-my-plugin.php
 ```php
 /**
  * Plugin Name: FanSided Powertools
@@ -69,47 +70,52 @@ if ( ! function_exists( 'add_filter' ) ) {
 	header( 'HTTP/1.1 403 Forbidden' );
 	exit();
 }
+// Create plugin instance on plugins_loaded action to maximize flexibility of wp hooks and filters system.
+require_once 'vendor/autoload.php';
+require_once 'app/class-wp-api.php';
+add_action( 'plugins_loaded', array( 'Custom\\My_Plugin\\My_Plugin', 'run' ) );
 
-// Hook initialization into the plugins_loaded action to maximize flexibility of hooks and filters
-add_action( 'plugins_loaded', array( 'Custom_Plugin', 'run' ) );
+```
 
-// Enable composer class libraries.
-require_once( 'vendor/autoload.php' );
+app/class-my-plugin.php
+```php
+namespace Custom\My_Plugin;
+use WPAZ_Plugin_Base\V_2_0\Abstract_Plugin;
 
-if ( ! class_exists( 'Custom_Plugin' ) ) {
-	/**
-	 * Class Custom_Plugin
-	 */
-	class Custom_Plugin extends \WPAZ_Plugin_Base\V_1_1\Plugin {
-		
-		protected $current_file = __FILE__;
-		
-		public function onload( $instance ) {
-			// Nothing yet
-		} // END public function __construct
-		
-		public function init() {
-			do_action( get_called_class() . '_before_init' );
-			
-			// Do plugin stuff usually looks something like
-			// My_Class->run();
-			
-			do_action( get_called_class() . '_after_init' );
-		}
-		
-		public function authenticated_init() {
-			if ( is_user_logged_in() ) {
-			    // Ready for wp-admin - but not required 
-			    //require_once( $this->installed_dir . '/admin/class-custom-plugin-admin.php' );
-                //$this->admin = new FanSided_Powertools_Admin( $this );
-			}
-		}
-		
-		protected function defines_and_globals() {
-		    // None yet.
-		}
-		
-	} // END class
-} // END if(!class_exists())
+/**
+ * Class My_Plugin
+ */
+class My_Plugin extends \WPAZ_Plugin_Base\V_2_0\Plugin {
+    
+    public static $autoload_class_prefix = __NAMESPACE__;
+    protected static $current_file = __FILE__;
+    
+    public function onload( $instance ) {
+        // Nothing yet
+    } // END public function __construct
+    
+    public function init() {
+        do_action( get_called_class() . '_before_init' );
+        
+        // Do plugin stuff usually looks something like
+        // $subclass = new Subfolder/Custom_Class_Subclass();
+        // $subclass->custom_plugin_function();
+        
+        do_action( get_called_class() . '_after_init' );
+    }
+    
+    public function authenticated_init() {
+        if ( is_user_logged_in() ) {
+            // Ready for wp-admin - but not required 
+            //require_once( $this->installed_dir . '/admin/class-custom-plugin-admin.php' );
+            //$this->admin = new FanSided_Powertools_Admin( $this );
+        }
+    }
+    
+    protected function defines_and_globals() {
+        // None yet.
+    }
+    
+} // END class
 
 ```

@@ -15,7 +15,7 @@
   ],
   "autoload": {
     "psr-4": {
-      "WPAZ_Plugin_Base\\V_1_1\\" : "src/"
+      "WPAZ_Plugin_Base\\V_2_0\\" : "src/"
     }
   }
 }
