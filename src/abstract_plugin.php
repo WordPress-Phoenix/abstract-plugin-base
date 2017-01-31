@@ -4,7 +4,7 @@
  *
  * @author  Seth Carstens
  * @package abtract-plugin-base
- * @version 1.1.3
+ * @version 2.0.0
  * @license GPL 2.0 - please retain comments that express original build of this file by the author.
  */
 
@@ -12,7 +12,7 @@
  * Namespace with versions as a solution to composer vs WordPress plugins
  * Reference url https://wptavern.com/a-narrative-of-using-composer-in-a-wordpress-plugin
  */
-namespace WPAZ_Plugin_Base\V_1_1;
+namespace WPAZ_Plugin_Base\V_2_0;
 
 /**
  * Class Plugin_Base
@@ -24,6 +24,55 @@ abstract class Abstract_Plugin {
 	 * @var bool $debug
 	 */
 	public $debug;
+
+	/**
+	 * Used to hold an instance of the admin object related to the plugin.
+	 *
+	 * @var null|\stdClass|Abstract_Plugin $admin
+	 */
+	public $admin;
+
+	/**
+	 * Use magic constant to tell abstract class current namespace as prefix for all other namespaces in the plugin.
+	 *
+	 * @var string $autoload_class_prefix magic constant
+	 */
+	public static $autoload_class_prefix = __NAMESPACE__;
+
+	/**
+	 * Define the folder or folders that spl_autoload should check for custom PHP classes that need autoloaded
+	 *
+	 * @var array|string $autoload_dir
+	 */
+	public $autoload_dir = [ '/app/', '/app/admin/', '/app/admin/inc/' ];
+
+	/**
+	 * Usually the depth of your namespace prefix, defaults to 1, only applies to psr-4 autoloading type.
+	 *
+	 * @var string $autoload_ns_match_depth more efficient when set to 2, when using package [ns_prefix]/[ns]
+	 */
+	public static $autoload_ns_match_depth = 1;
+
+	/**
+	 * Autoload type can be classmap or psr-4
+	 *
+	 * @var string $autoload_dir classmap or psr-4
+	 */
+	public static $autoload_type = 'classmap';
+
+	/**
+	 * Magic constant trick that allows extended classes to pull actual server file location, copy into subclass.
+	 *
+	 * @var string $current_file
+	 */
+	protected $current_file = __FILE__;
+
+	/**
+	 * Filename prefix standard for WordPress when the file represents a class
+	 *
+	 * @var string $filename_prefix typically class- is the prefix
+	 */
+	public static $filename_prefix = 'class-';
 
 	/**
 	 * Plugins installed directory on the server
@@ -40,13 +89,6 @@ abstract class Abstract_Plugin {
 	public $installed_url;
 
 	/**
-	 * Used to hold an instance of the admin object related to the plugin.
-
-	 * @var null|\stdClass|Abstract_Plugin $admin
-	 */
-	public $admin;
-
-	/**
 	 * Modules is a collection class that holds the modules / parts of the plugin.
 	 *
 	 * @var \stdClass $modules
@@ -59,20 +101,6 @@ abstract class Abstract_Plugin {
 	 * @var string $network_url
 	 */
 	public $network_url;
-
-	/**
-	 * Define the folder or folders that spl_autoload should check for custom PHP classes that need autoloaded
-	 *
-	 * @var array|string $autoload_dir
-	 */
-	public $autoload_dir = [ '/inc/', '/admin/', '/admin/inc/' ];
-
-	/**
-	 * Magic constant trick that allows extended classes to pull actual server file location, copy into subclass.
-	 *
-	 * @var string $current_file
-	 */
-	protected $current_file = __FILE__;
 
 	/**
 	 * Construct the plugin object.
@@ -112,23 +140,12 @@ abstract class Abstract_Plugin {
 	} // END public function __construct
 
 	/**
-	 * Initialize the plugin - for public (front end)
+	 * Activated the plugin actions
 	 *
-	 * @param mixed $instance Parent instance passed through to child.
-	 * @since   0.1
 	 * @return  void
 	 */
-	abstract public function onload( $instance );
-
-	/**
-	 * Initialize the plugin - for public (front end)
-	 * Example of building a module of the plugin into init
-	 * ```$this->modules->FS_Mail = new FS_Mail( $this, $this->installed_dir );```
-	 *
-	 * @since   0.1
-	 * @return  void
-	 */
-	abstract public function init();
+	public static function activate() {
+	}
 
 	/**
 	 * Initialize the plugin - for admin (back end)
@@ -142,27 +159,30 @@ abstract class Abstract_Plugin {
 	abstract public function authenticated_init();
 
 	/**
-	 * Activated the plugin actions
+	 * Auto-load classes on demand to reduce memory consumption. Classes must have a namespace so as to resolve
+	 * performance issues around auto-loading classes unrelated to current plugin.
 	 *
-	 * @return  void
+	 * @param string $class The name of the class object.
 	 */
-	public static function activate() {
-	}
+	public function autoload( $class ) {
+		$parent               = explode( '\\', get_class( $this ) );
+		$class_array          = explode( '\\', $class );
+		$intersect            = array_intersect_assoc( $parent, $class_array );
+		$intersect_depth      = count( $intersect );
+		$autoload_match_depth = static::$autoload_ns_match_depth;
+		// Confirm $class is in same namespace as this autoloader
+		if ( $intersect_depth >= $autoload_match_depth ) {
+			$file = $this->get_file_name_from_class( $class );
+			if ( 'classmap' === static::$autoload_type && is_array( $this->autoload_dir ) ) {
+				foreach ( $this->autoload_dir as $dir ) {
+					$this->load_file( $this->installed_dir . $dir . $file );
+				}
+			} else {
+				$this->load_file( $this->installed_dir . $file );
+			}
+		}
 
-	/**
-	 * Deactivated the plugin actions
-	 *
-	 * @return  void
-	 */
-	public static function deactivate() {
 	}
-
-	/**
-	 * Enforce that the plugin prepare any defines or globals in a standard location.
-	 *
-	 * @return mixed
-	 */
-	abstract protected function defines_and_globals();
 
 	/**
 	 * Setup plugins global params.
@@ -183,66 +203,48 @@ abstract class Abstract_Plugin {
 	}
 
 	/**
-	 * Take a class name and turn it into a file name.
+	 * Deactivated the plugin actions
 	 *
-	 * @param  string $class Raw class name.
-	 *
-	 * @return string
+	 * @return  void
 	 */
-	private function get_file_name_from_class( $class ) {
-		$filtered_class_name = explode( '\\', $class );
-		$class_filename      = end( $filtered_class_name );
-
-		return 'class-' . str_replace( '_', '-', $class_filename ) . '.php';
+	public static function deactivate() {
 	}
 
 	/**
-	 * Include a class file.
+	 * Enforce that the plugin prepare any defines or globals in a standard location.
 	 *
-	 * @param  string $path Server path to file for inclusion.
-	 *
-	 * @return bool successful or not
+	 * @return mixed
 	 */
-	private function load_file( $path ) {
-		if ( $path && is_readable( $path ) ) {
-			include_once( $path );
-
-			return true;
-		}
-
-		return false;
-	}
+	abstract protected function defines_and_globals();
 
 	/**
-	 * Auto-load classes on demand to reduce memory consumption.
+	 * Utility function to get class name from filename if you follow this abstract plugin's naming standards
 	 *
-	 * @param string $class The name of the class object.
+	 * @param string $file          Absolute path to file.
+	 * @param string $installed_dir Absolute path to plugin folder.
+	 * @param string $namespace     Namespace of calling class, if any.
+	 *
+	 * @return string $class_name Name of Class to load based on file path.
 	 */
-	public function autoload( $class ) {
-		$class = strtolower( $class );
-		$file  = $this->get_file_name_from_class( $class );
-		if ( ! is_array( $this->autoload_dir ) ) {
-			$this->load_file( $this->installed_dir . $this->autoload_dir . $file );
-		} else {
-			foreach ( $this->autoload_dir as $dir ) {
-				$this->load_file( $this->installed_dir . $dir . $file );
-			}
-		}
-	}
+	public static function filepath_to_classname( $file, $installed_dir, $namespace ) {
+		/**
+		 * Convert path and filename into namespace and class
+		 */
+		$path_info     = str_ireplace( $installed_dir, '', $file );
+		$path_info     = pathinfo( $path_info );
+		$converted_dir = str_replace( '/', '\\', $path_info['dirname'] );
+		$converted_dir = ucwords( $converted_dir, '_\\' );
+		$filename_search        = array( static::$filename_prefix, '-' );
+		$filename_replace       = array( '', '_' );
+		$class         = str_ireplace( $filename_search, $filename_replace, $path_info['filename'] );
+		$class_name    = $namespace . $converted_dir . '\\' . ucwords( $class, '_' );
 
-	/**
-	 * Build and initialize the plugin.
-	 */
-	public static function run() {
-		// Installation and un-installation hooks.
-		register_activation_hook( __FILE__, array( get_called_class(), 'activate' ) );
-		register_deactivation_hook( __FILE__, array( get_called_class(), 'deactivate' ) );
-		self::set();
+		return $class_name;
 	}
 
 	/**
 	 * Used to get the instance of the class as an unforced singleton model
-
+	 *
 	 * @return bool|Abstract_Plugin|mixed $instance
 	 */
 	public function get() {
@@ -255,12 +257,105 @@ abstract class Abstract_Plugin {
 		}
 	}
 
+	/**
+	 * Take a class name and turn it into a file name.
+	 *
+	 * @param  string $class Raw class name.
+	 *
+	 * @return string
+	 */
+	private function get_file_name_from_class( $class ) {
+		if ( 'classmap' === static::$autoload_type ) {
+			$filtered_class_name = explode( '\\', $class );
+			$class_filename      = end( $filtered_class_name );
+			$class_filename      = str_replace( '_', '-', $class_filename );
+
+			return static::$filename_prefix . $class_filename . '.php';
+		} else {
+
+			return $this->psr4_get_file_name_from_class( $class );
+		}
+	}
+
+	/**
+	 * Initialize the plugin - for public (front end)
+	 * Example of building a module of the plugin into init
+	 * ```$this->modules->FS_Mail = new FS_Mail( $this, $this->installed_dir );```
+	 *
+	 * @since   0.1
+	 * @return  void
+	 */
+	abstract public function init();
+
+	/**
+	 * Initialize the plugin - for public (front end)
+	 *
+	 * @param mixed $instance Parent instance passed through to child.
+	 *
+	 * @since   0.1
+	 * @return  void
+	 */
+	abstract public function onload( $instance );
+
+	/**
+	 * Include a class file.
+	 *
+	 * @param  string $path Server path to file for inclusion.
+	 *
+	 * @return bool successful or not
+	 */
+	private function load_file( $path ) {
+		if ( $path && is_readable( $path ) ) {
+			include_once( $path );
+			$success = true;
+		}
+
+		return ! ( empty( $success ) ) ? true : false;
+	}
+
+	/**
+	 * Take a namespaced class name and turn it into a file name.
+	 *
+	 * @param  string $class
+	 * fansided\controllers\analytics
+	 *
+	 * @return string
+	 */
+	private function psr4_get_file_name_from_class( $class ) {
+		$class = strtolower( $class );
+		if ( stristr( $class, '\\' ) ) {
+
+			// if the first item is == the collection name, trim it off
+			$class = str_ireplace( static::$autoload_class_prefix, '', $class );
+
+			// Maybe fix formatting underscores to dashes and double to single slashes.
+			$class     = str_replace( array( '_', '\\' ), array( '-', '/' ), $class );
+			$class     = explode( '/', $class );
+			$file_name = &$class[ count( $class ) - 1 ];
+			$file_name = static::$filename_prefix . $file_name . '.php';
+			$file_path = join( DIRECTORY_SEPARATOR, $class );
+
+			return $file_path;
+		} else {
+			return static::$filename_prefix . str_replace( '_', '-', $class ) . '.php';
+		}
+	}
+
+	/**
+	 * Build and initialize the plugin.
+	 */
+	public static function run() {
+		// Installation and un-installation hooks.
+		register_activation_hook( __FILE__, array( get_called_class(), 'activate' ) );
+		register_deactivation_hook( __FILE__, array( get_called_class(), 'deactivate' ) );
+		register_uninstall_hook( __FILE__, array( get_called_class(), 'uninstall' ) );
+		self::set();
+	}
 
 	/**
 	 * Used to setup the instance of the class and place in wp_plugins collection.
-
 	 *
-*@param bool|Abstract_Plugin|mixed $instance Contains object representing the plugin.
+	 * @param bool|Abstract_Plugin|mixed $instance Contains object representing the plugin.
 	 */
 	private static function set( $instance = false ) {
 		// Make sure the plugin hasn't already been instantiated before.
@@ -276,6 +371,14 @@ abstract class Abstract_Plugin {
 		} else {
 			$wp_plugins->$plugin_name = $instance;
 		}
+	}
+
+	/**
+	 * Uninstall the plugin actions
+	 *
+	 * @return  void
+	 */
+	public static function uninstall() {
 	}
 
 } // END class
