@@ -13,25 +13,25 @@ WordPress options builder class is a library that helps you setup theme or plugi
 
 ## Composer style (recommended)
 
-Information about installing and using Composer: [https://getcomposer.org/doc/00-intro.md](https://getcomposer.org/doc/00-intro.md). If you've already got brew, you can install Composer by running `brew install homebrew/php/composer`, or alternatively you can use composer inside of VVV. 
-
-Via composer command line: 
+Via composer command line like
 ```
 composer require WordPress-Phoenix/abstract-plugin-base && composer install
 ```
 
-...or by manually configuring the composer file by including in your plugin. Create or add the following to your composer.json file in the root of the plugin: 
+Or manually configuring the composer file like
+
+1. Include in your plugin by creating or adding the following to your composer.json file in the root of the plugin
 ```json
 {
   "require": {
-    "WordPress-Phoenix/abstract-plugin-base": "1.*"
+    "WordPress-Phoenix/abstract-plugin-base": "2.*"
   }
 }
 ```
-1. Confirm that composer is installed in your development enviroment using `which composer`.
-2. Open CLI into your plugins root directory and run `composer install`.
-3. Confirm that it created the vendor folder in your plugin.
-4. In your plugins main file, near the code where you include other files place the following:
+2. Confirm that composer is installed in your development enviroment using `which composer`.
+3. Open CLI into your plugins root directory and run `composer install`.
+4. Confirm that it created the vendor folder in your plugin.
+5. In your plugins main file, near the code where you include other files place the following:
 ```php
 if( file_exists( dirname( __FILE__ ) . 'vendor/autoload.php' ) ) {
   include_once dirname( __FILE__ ) . 'vendor/autoload.php';
@@ -46,72 +46,76 @@ if( file_exists( dirname( __FILE__ ) . 'vendor/autoload.php' ) ) {
 # Usage
 
 ## Why should you use this library when building your plugin?
-By building your plugin using OOP principals, and extending this Plugin_Base class object, 
-you will be able to quickly and efficiently build your plugin, allowing it to be simple to 
-start, but giving it the ability to grow complex without changing its architecture. Immediate 
+By building your plugin using OOP principals, and extending this Plugin_Base class object, you will be able to quickly and efficiently build
+your plugin, allowing it to be simple to start, but giving it the ability to grow complex without changing its architecture. Immediate 
 features include:
-
 - Built in SPL Autoload for your includes folder, should you follow WordPress codex naming standards for class files.
 - Template class provides you all the best practices for standard plugin initialization
 - Minimizes code needed / maintenance of your main plugin file.
 - Assists developers new to WordPress plugin development in file / folder architecture.
 - By starting all your plugins with the same architecture, we create a standard thats better for the dev community.
 
-## Main plugin file example
+## Simplist example of the main plugin file, and required plugin class file
 
+custom-my-plugin.php
 ```php
 /**
  * Plugin Name: FanSided Powertools
  * Plugin URI: https://github.com/fansided/fansided-powertools.git
  */
 
-// Avoid direct calls to this file, because now WP core and framework has been used
+//avoid direct calls to this file, because now WP core and framework has been used
 if ( ! function_exists( 'add_filter' ) ) {
 	header( 'Status: 403 Forbidden' );
 	header( 'HTTP/1.1 403 Forbidden' );
 	exit();
 }
+// Create plugin instance on plugins_loaded action to maximize flexibility of wp hooks and filters system.
+require_once 'vendor/autoload.php';
+require_once 'app/class-wp-api.php';
+add_action( 'plugins_loaded', array( 'Custom\\My_Plugin\\My_Plugin', 'run' ) );
 
-// Hook initialization into the plugins_loaded action to maximize flexibility of hooks and filters
-add_action( 'plugins_loaded', array( 'Custom_Plugin', 'run' ) );
+```
 
-// Enable composer class libraries.
-require_once( 'vendor/autoload.php' );
+app/class-my-plugin.php
+```php
+namespace Custom\My_Plugin;
+use WPAZ_Plugin_Base\V_2_0\Abstract_Plugin;
 
-if ( ! class_exists( 'Custom_Plugin' ) ) {
-	/**
-	 * Class Custom_Plugin
-	 */
-	class Custom_Plugin extends \WPAZ_Plugin_Base\V_1_1\Plugin {
-		
-		protected $current_file = __FILE__;
-		
-		public function onload( $instance ) {
-			// Nothing yet
-		} // END public function __construct
-		
-		public function init() {
-			do_action( get_called_class() . '_before_init' );
-			
-			// Do plugin stuff like:
-			//add_action( 'wp_enqueue_scripts', array( get_called_class(), 'my_function' ) );
-			
-			do_action( get_called_class() . '_after_init' );
-		}
-		
-		public function authenticated_init() {
-			if ( is_user_logged_in() ) {
-			    // Ready for wp-admin but not required 
-			    //require_once( $this->installed_dir . '/admin/class-custom-plugin-admin.php' );
-                            //$this->admin = new FanSided_Powertools_Admin( $this );
-			}
-		}
-		
-		protected function defines_and_globals() {
-		    // None yet.
-		}
-		
-	} // END class
-} // END if( ! class_exists() )
+/**
+ * Class My_Plugin
+ */
+class My_Plugin extends \WPAZ_Plugin_Base\V_2_0\Plugin {
+    
+    public static $autoload_class_prefix = __NAMESPACE__;
+    protected static $current_file = __FILE__;
+    
+    public function onload( $instance ) {
+        // Nothing yet
+    } // END public function __construct
+    
+    public function init() {
+        do_action( get_called_class() . '_before_init' );
+        
+        // Do plugin stuff usually looks something like
+        // $subclass = new Subfolder/Custom_Class_Subclass();
+        // $subclass->custom_plugin_function();
+        
+        do_action( get_called_class() . '_after_init' );
+    }
+    
+    public function authenticated_init() {
+        if ( is_user_logged_in() ) {
+            // Ready for wp-admin - but not required 
+            //require_once( $this->installed_dir . '/admin/class-custom-plugin-admin.php' );
+            //$this->admin = new FanSided_Powertools_Admin( $this );
+        }
+    }
+    
+    protected function defines_and_globals() {
+        // None yet.
+    }
+    
+} // END class
 
 ```
