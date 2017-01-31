@@ -4,7 +4,7 @@
  *
  * @author  Seth Carstens
  * @package abtract-plugin-base
- * @version 2.0.1
+ * @version 2.0.2
  * @license GPL 2.0 - please retain comments that express original build of this file by the author.
  */
 
@@ -65,7 +65,7 @@ abstract class Abstract_Plugin {
 	 *
 	 * @var string $current_file
 	 */
-	protected $current_file = __FILE__;
+	protected static $current_file = __FILE__;
 
 	/**
 	 * Filename prefix standard for WordPress when the file represents a class
@@ -190,8 +190,8 @@ abstract class Abstract_Plugin {
 	protected function configure_defaults() {
 		$this->modules        = new \stdClass();
 		$this->modules->count = 0;
-		$this->installed_dir  = dirname( $this->current_file );
-		$this->installed_url  = plugins_url( '/', $this->current_file );
+		$this->installed_dir  = dirname( static::$current_file );
+		$this->installed_url  = plugins_url( '/', static::$current_file );
 
 		// Setup network url and fallback in case siteurl is not defined.
 		if ( ! defined( 'WP_NETWORKURL' ) && is_multisite() ) {

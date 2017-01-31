@@ -1,3 +1,10 @@
+#### 2.0.2
+* Large rewrite to handle namespaces and psr-4 option
+* Alpha sorted parameter and function names
+* Uses namespace matching filter for better performance
+* Now requires use of namespaces to properly load files
+* Updated documentation
+
 #### 1.1.3
 * Fixed filename to follow PSR-4 standard requirement
 
