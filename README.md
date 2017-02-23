@@ -11,31 +11,18 @@ WordPress options builder class is a library that helps you setup theme or plugi
 
 # Installation
 
-## Composer style (recommended)
+You can use this library to start a new plugin from scratch, or you can enhance your existing plugins with this library. Once you have read over the installation instructions it should make sense which direction to go.
 
-Via composer command line like
-```
+## Composer style (recommended)
+1. Confirm that composer is installed in your development environment using `which composer`. If CLI does not print any path, you need to install composer like `brew install composer`.
+2. Set CLI working directory to wp-content/plugins/{your-plugin-name}
+3. Install Abstract_Plugin class via composer command line like
+```bash
 composer require WordPress-Phoenix/abstract-plugin-base && composer install
 ```
-
-Or manually configuring the composer file like
-
-1. Include in your plugin by creating or adding the following to your composer.json file in the root of the plugin
-```json
-{
-  "require": {
-    "WordPress-Phoenix/abstract-plugin-base": "2.*"
-  }
-}
-```
-2. Confirm that composer is installed in your development enviroment using `which composer`.
-3. Open CLI into your plugins root directory and run `composer install`.
-4. Confirm that it created the vendor folder in your plugin.
-5. In your plugins main file, near the code where you include other files place the following:
+4. In your plugins main file, near the top of the file place the following:
 ```php
-if( file_exists( dirname( __FILE__ ) . 'vendor/autoload.php' ) ) {
-  include_once dirname( __FILE__ ) . 'vendor/autoload.php';
-}
+include_once dirname( __FILE__ ) . 'vendor/autoload.php';
 ```
 
 ## Manual Installation
@@ -55,12 +42,12 @@ features include:
 - Assists developers new to WordPress plugin development in file / folder architecture.
 - By starting all your plugins with the same architecture, we create a standard thats better for the dev community.
 
-## Simplist example of the main plugin file, and required plugin class file
+## Simplest example of the main plugin file, and required plugin class file
 
 custom-my-plugin.php
 ```php
 /**
- * Plugin Name: FanSided Powertools
+ * Plugin Name: Custom My Plugin
  * Plugin URI: https://github.com/fansided/fansided-powertools.git
  */
 
@@ -71,8 +58,8 @@ if ( ! function_exists( 'add_filter' ) ) {
 	exit();
 }
 // Create plugin instance on plugins_loaded action to maximize flexibility of wp hooks and filters system.
-require_once 'vendor/autoload.php';
-require_once 'app/class-wp-api.php';
+include_once 'vendor/autoload.php';
+include_once 'app/class-wp-api.php';
 add_action( 'plugins_loaded', array( 'Custom\\My_Plugin\\My_Plugin', 'run' ) );
 
 ```
