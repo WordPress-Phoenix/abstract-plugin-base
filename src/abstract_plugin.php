@@ -317,7 +317,6 @@ abstract class Abstract_Plugin {
 	 * Take a namespaced class name and turn it into a file name.
 	 *
 	 * @param  string $class
-	 * fansided\controllers\analytics
 	 *
 	 * @return string
 	 */
