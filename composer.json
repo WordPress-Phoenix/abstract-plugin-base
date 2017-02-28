@@ -14,8 +14,8 @@
     }
   ],
   "autoload": {
-    "psr-4": {
-      "WPAZ_Plugin_Base\\V_2_0\\" : "src/"
+    "classmap": {
+      "classmap": ["src/abstract_plugin.php"]
     }
   }
 }

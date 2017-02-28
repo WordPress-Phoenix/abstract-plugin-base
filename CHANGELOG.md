@@ -1,3 +1,6 @@
+#### 2.0.3
+* Back to classmap loading, WP vs PSR-4 = fail
+
 #### 2.0.2
 * Large rewrite to handle namespaces and psr-4 option
 * Alpha sorted parameter and function names

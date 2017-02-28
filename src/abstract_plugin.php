@@ -4,7 +4,7 @@
  *
  * @author  Seth Carstens
  * @package abtract-plugin-base
- * @version 2.0.2
+ * @version 2.0.3
  * @license GPL 2.0 - please retain comments that express original build of this file by the author.
  */
 
