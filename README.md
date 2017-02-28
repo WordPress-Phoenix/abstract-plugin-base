@@ -59,7 +59,7 @@ if ( ! function_exists( 'add_filter' ) ) {
 }
 // Create plugin instance on plugins_loaded action to maximize flexibility of wp hooks and filters system.
 include_once 'vendor/autoload.php';
-include_once 'app/class-wp-api.php';
+include_once 'app/class-my-plugin.php';
 add_action( 'plugins_loaded', array( 'Custom\\My_Plugin\\My_Plugin', 'run' ) );
 
 ```
