@@ -72,7 +72,7 @@ use WPAZ_Plugin_Base\V_2_0\Abstract_Plugin;
 /**
  * Class My_Plugin
  */
-class My_Plugin extends \WPAZ_Plugin_Base\V_2_0\Plugin {
+class My_Plugin extends \WPAZ_Plugin_Base\V_2_0\Abstract_Plugin {
     
     public static $autoload_class_prefix = __NAMESPACE__;
     protected static $current_file = __FILE__;
