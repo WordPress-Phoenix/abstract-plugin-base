@@ -1,3 +1,12 @@
+#### 2.3.0
+* Add ability to turn off auto-loading for VIP hosting
+* Add plugin_data and version
+* Fix scoping issue with plugin activation
+* Simplified plugins_loaded init by moving into static run function
+* Removed vendor autoload loader from main plugin
+* Had to skip version 2.1 and 2.2 as several plugins were hot-patched with those version and we don't want to run into those.
+* Moved filename back to a dash, since VIP requires a dash for CI phpcs rules, works fine since plugin uses vendor autoload by classmap anyways
+
 #### 2.0.3
 * Back to classmap loading, WP vs PSR-4 = fail
 

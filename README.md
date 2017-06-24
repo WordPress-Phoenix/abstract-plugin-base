@@ -40,15 +40,16 @@ features include:
 - Template class provides you all the best practices for standard plugin initialization
 - Minimizes code needed / maintenance of your main plugin file.
 - Assists developers new to WordPress plugin development in file / folder architecture.
-- By starting all your plugins with the same architecture, we create a standard thats better for the dev community.
+- By starting all your plugins with the same architecture, we create a standard that is better for the dev community.
 
 ## Simplest example of the main plugin file, and required plugin class file
 
 custom-my-plugin.php
 ```php
+<?php
 /**
  * Plugin Name: Custom My Plugin
- * Plugin URI: https://github.com/fansided/fansided-powertools.git
+ * Plugin URI: https://github.com/
  */
 
 //avoid direct calls to this file, because now WP core and framework has been used
@@ -60,22 +61,26 @@ if ( ! function_exists( 'add_filter' ) ) {
 // Create plugin instance on plugins_loaded action to maximize flexibility of wp hooks and filters system.
 include_once 'vendor/autoload.php';
 include_once 'app/class-my-plugin.php';
-add_action( 'plugins_loaded', array( 'Custom\\My_Plugin\\My_Plugin', 'run' ) );
+Custom\My_Plugin\App::run( __FILE__ );
 
 ```
 
-app/class-my-plugin.php
+app/class-app.php
 ```php
+<?php
 namespace Custom\My_Plugin;
-use WPAZ_Plugin_Base\V_2_0\Abstract_Plugin;
+use WPAZ_Plugin_Base\V_2_3\Abstract_Plugin;
 
 /**
- * Class My_Plugin
+ * Class App
  */
-class My_Plugin extends \WPAZ_Plugin_Base\V_2_0\Abstract_Plugin {
+class App extends Abstract_Plugin {
     
     public static $autoload_class_prefix = __NAMESPACE__;
     protected static $current_file = __FILE__;
+    public static $autoload_type = 'psr-4';
+    // Set to 2 when you use 2 namespaces in the main app file
+    public static $autoload_ns_match_depth = 2;
     
     public function onload( $instance ) {
         // Nothing yet
@@ -83,19 +88,17 @@ class My_Plugin extends \WPAZ_Plugin_Base\V_2_0\Abstract_Plugin {
     
     public function init() {
         do_action( get_called_class() . '_before_init' );
-        
         // Do plugin stuff usually looks something like
-        // $subclass = new Subfolder/Custom_Class_Subclass();
+        // $subclass = new OptionalAppSubfolder/Custom_Class_Subclass();
         // $subclass->custom_plugin_function();
-        
         do_action( get_called_class() . '_after_init' );
     }
     
     public function authenticated_init() {
         if ( is_user_logged_in() ) {
             // Ready for wp-admin - but not required 
-            //require_once( $this->installed_dir . '/admin/class-custom-plugin-admin.php' );
-            //$this->admin = new FanSided_Powertools_Admin( $this );
+            //require_once( $this->installed_dir . '/admin/class-admin-app.php' );
+            //$this->admin = new Admin/Admin_App( $this );
         }
     }
     
