@@ -4,7 +4,7 @@
  *
  * @author  Seth Carstens
  * @package abtract-plugin-base
- * @version 2.0.3
+ * @version 2.3.0
  * @license GPL 2.0 - please retain comments that express original build of this file by the author.
  */
 
@@ -12,7 +12,8 @@
  * Namespace with versions as a solution to composer vs WordPress plugins
  * Reference url https://wptavern.com/a-narrative-of-using-composer-in-a-wordpress-plugin
  */
-namespace WPAZ_Plugin_Base\V_2_0;
+
+namespace WPAZ_Plugin_Base\V_2_3;
 
 /**
  * Class Plugin_Base
@@ -56,7 +57,7 @@ abstract class Abstract_Plugin {
 	/**
 	 * Autoload type can be classmap or psr-4
 	 *
-	 * @var string $autoload_dir classmap or psr-4
+	 * @var string $autoload_dir classmap or psr-4 or false
 	 */
 	public static $autoload_type = 'classmap';
 
@@ -103,6 +104,20 @@ abstract class Abstract_Plugin {
 	public $network_url;
 
 	/**
+	 * When main plugin filename matches folder name this gets the value from get_plugin_data()
+	 *
+	 * @var array $plugin_data Array of meta data representing meta from main plugin file
+	 */
+	public $plugin_data = array();
+
+	/**
+	 * If plugin_data is built, this represents the version number defined the the main plugin file meta
+	 *
+	 * @var string $version
+	 */
+	public $version;
+
+	/**
 	 * Construct the plugin object.
 	 * Note that classes that extend this class should add there construction actions into onload()
 	 */
@@ -117,12 +132,9 @@ abstract class Abstract_Plugin {
 		// Define globals used by the plugin including bloginfo.
 		$this->defines_and_globals();
 
-		// Register auto-loading to include any files in the $autoload_dir.
-		spl_autoload_register( array( $this, 'autoload' ) );
-
-		// Enable any composer libraries if they exist.
-		if ( file_exists( $this->installed_dir . '/vendor/autoload.php' ) ) {
-			include_once( $this->installed_dir . '/vendor/autoload.php' );
+		// If enabled, register auto-loading to include any files in the $autoload_dir.
+		if ( ! empty( static::$autoload_type ) ) {
+			spl_autoload_register( array( $this, 'autoload' ) );
 		}
 
 		// Onload to do things during plugin construction.
@@ -142,7 +154,7 @@ abstract class Abstract_Plugin {
 	/**
 	 * Activated the plugin actions
 	 *
-	 * @return  void
+	 * @return void
 	 */
 	public static function activate() {
 	}
@@ -192,7 +204,14 @@ abstract class Abstract_Plugin {
 		$this->modules->count = 0;
 		$this->installed_dir  = dirname( static::$current_file );
 		$this->installed_url  = plugins_url( '/', static::$current_file );
-
+		$plugin_file_name     = basename( dirname( $this->installed_dir ) ) . '.php';
+		$plugin_file          = dirname( $this->installed_dir ) . '/' . $plugin_file_name;
+		if ( file_exists( $plugin_file ) ) {
+			$this->plugin_data = get_plugin_data( $plugin_file, $markup = true, $translate = true );
+			if ( is_array( $this->plugin_data ) && isset( $this->plugin_data['Version'] ) ) {
+				$this->version = $this->plugin_data['Version'];
+			}
+		}
 		// Setup network url and fallback in case siteurl is not defined.
 		if ( ! defined( 'WP_NETWORKURL' ) && is_multisite() ) {
 			define( 'WP_NETWORKURL', network_site_url() );
@@ -230,14 +249,14 @@ abstract class Abstract_Plugin {
 		/**
 		 * Convert path and filename into namespace and class
 		 */
-		$path_info     = str_ireplace( $installed_dir, '', $file );
-		$path_info     = pathinfo( $path_info );
-		$converted_dir = str_replace( '/', '\\', $path_info['dirname'] );
-		$converted_dir = ucwords( $converted_dir, '_\\' );
-		$filename_search        = array( static::$filename_prefix, '-' );
-		$filename_replace       = array( '', '_' );
-		$class         = str_ireplace( $filename_search, $filename_replace, $path_info['filename'] );
-		$class_name    = $namespace . $converted_dir . '\\' . ucwords( $class, '_' );
+		$path_info        = str_ireplace( $installed_dir, '', $file );
+		$path_info        = pathinfo( $path_info );
+		$converted_dir    = str_replace( '/', '\\', $path_info['dirname'] );
+		$converted_dir    = ucwords( $converted_dir, '_\\' );
+		$filename_search  = array( static::$filename_prefix, '-' );
+		$filename_replace = array( '', '_' );
+		$class            = str_ireplace( $filename_search, $filename_replace, $path_info['filename'] );
+		$class_name       = $namespace . $converted_dir . '\\' . ucwords( $class, '_' );
 
 		return $class_name;
 	}
@@ -341,13 +360,22 @@ abstract class Abstract_Plugin {
 	}
 
 	/**
-	 * Build and initialize the plugin.
+	 * Setup special hooks that don't run after plugins_loaded action
+	 *
+	 * @param $file
 	 */
-	public static function run() {
+	public static function run( $file ) {
 		// Installation and un-installation hooks.
-		register_activation_hook( __FILE__, array( get_called_class(), 'activate' ) );
-		register_deactivation_hook( __FILE__, array( get_called_class(), 'deactivate' ) );
-		register_uninstall_hook( __FILE__, array( get_called_class(), 'uninstall' ) );
+		register_activation_hook( $file, array( get_called_class(), 'activate' ) );
+		register_deactivation_hook( $file, array( get_called_class(), 'deactivate' ) );
+		register_uninstall_hook( $file, array( get_called_class(), 'uninstall' ) );
+		add_action( 'plugins_loaded', array( get_called_class(), 'load' ) );
+	}
+
+	/**
+	 * Build and initialize the plugin - on plugins_loaded
+	 */
+	public static function load() {
 		self::set();
 	}
 
