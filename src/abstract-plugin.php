@@ -4,7 +4,7 @@
  *
  * @author  Seth Carstens
  * @package abtract-plugin-base
- * @version 2.3.1
+ * @version 2.4.0
  * @license GPL 2.0 - please retain comments that express original build of this file by the author.
  */
 
@@ -13,7 +13,7 @@
  * Reference url https://wptavern.com/a-narrative-of-using-composer-in-a-wordpress-plugin
  */
 
-namespace WPAZ_Plugin_Base\V_2_3;
+namespace WPAZ_Plugin_Base\V_2_4;
 
 /**
  * Class Plugin_Base
@@ -268,7 +268,7 @@ abstract class Abstract_Plugin {
 	 *
 	 * @return bool|Abstract_Plugin|mixed $instance
 	 */
-	public function get() {
+	public static function get() {
 		global $wp_plugins;
 		$plugin_name = strtolower( get_called_class() );
 		if ( isset( $wp_plugins ) && isset( $wp_plugins->$plugin_name ) ) {
