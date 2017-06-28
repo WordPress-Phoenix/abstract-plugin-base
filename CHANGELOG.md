@@ -1,3 +1,6 @@
+#### 2.3.1
+* Fix fatal error caused by get_plugin_data function not always available
+
 #### 2.3.0
 * Add ability to turn off auto-loading for VIP hosting
 * Add plugin_data and version
