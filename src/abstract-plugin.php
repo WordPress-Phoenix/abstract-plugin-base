@@ -4,7 +4,7 @@
  *
  * @author  Seth Carstens
  * @package abtract-plugin-base
- * @version 2.3.0
+ * @version 2.3.1
  * @license GPL 2.0 - please retain comments that express original build of this file by the author.
  */
 
@@ -207,6 +207,8 @@ abstract class Abstract_Plugin {
 		$plugin_file_name     = basename( dirname( $this->installed_dir ) ) . '.php';
 		$plugin_file          = dirname( $this->installed_dir ) . '/' . $plugin_file_name;
 		if ( file_exists( $plugin_file ) ) {
+			// Ensure get_plugin_data is available
+			require_once( ABSPATH . 'wp-admin/includes/plugin.php' );
 			$this->plugin_data = get_plugin_data( $plugin_file, $markup = true, $translate = true );
 			if ( is_array( $this->plugin_data ) && isset( $this->plugin_data['Version'] ) ) {
 				$this->version = $this->plugin_data['Version'];
