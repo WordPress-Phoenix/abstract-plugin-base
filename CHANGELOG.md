@@ -1,3 +1,6 @@
+#### 2.4.0
+* adjust App::get() to be static for easy access to plugin object
+
 #### 2.3.1
 * Fix fatal error caused by get_plugin_data function not always available
 
