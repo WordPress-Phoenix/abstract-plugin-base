@@ -20,10 +20,7 @@ You can use this library to start a new plugin from scratch, or you can enhance 
 ```bash
 composer require WordPress-Phoenix/abstract-plugin-base && composer install
 ```
-4. In your plugins main file, near the top of the file place the following:
-```php
-include_once dirname( __FILE__ ) . 'vendor/autoload.php';
-```
+4. Look at sample code below to see how to include this library in your plugin.
 
 ## Manual Installation
 1. Download the most updated copy of this repository from `https://api.github.com/repos/WordPress-Phoenix/abstract-plugin-base/zipball`
@@ -69,7 +66,7 @@ app/class-app.php
 ```php
 <?php
 namespace Custom\My_Plugin;
-use WPAZ_Plugin_Base\V_2_3\Abstract_Plugin;
+use WPAZ_Plugin_Base\V_2_5\Abstract_Plugin;
 
 /**
  * Class App

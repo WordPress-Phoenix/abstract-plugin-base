@@ -1,3 +1,8 @@
+#### 2.5.0
+* Added logic that allows WordPress VIP hosted plugins to run on init instead of plugins_loaded.
+* Added parameters and logic to determine is_network_active on the plugin object.
+* Added abstract_plugin version to easily tell which version of abstract_plugin the actual plugin object is using.
+
 #### 2.4.0
 * adjust App::get() to be static for easy access to plugin object
 
