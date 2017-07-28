@@ -1,3 +1,6 @@
+#### 2.5.1
+* Fix single site issue
+
 #### 2.5.0
 * Added logic that allows WordPress VIP hosted plugins to run on init instead of plugins_loaded.
 * Added parameters and logic to determine is_network_active on the plugin object.
