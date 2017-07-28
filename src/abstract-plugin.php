@@ -243,7 +243,11 @@ abstract class Abstract_Plugin {
 		$assumed_plugin_name     = basename( $this->plugin_basedir );
 		$this->plugin_file       = $this->plugin_basedir . '/' . $assumed_plugin_name . '.php';
 		$this->wp_plugin_slug    = $assumed_plugin_name . '/' . $assumed_plugin_name . '.php';
-		$this->is_network_active = is_plugin_active_for_network( $this->wp_plugin_slug );
+
+		if ( is_callable( 'is_plugin_active_for_network' ) ) {
+			$this->is_network_active = is_plugin_active_for_network( $this->wp_plugin_slug );
+		}
+
 		if ( file_exists( $this->plugin_file ) ) {
 			$this->installed_url = plugins_url( '/', $this->plugin_file );
 			// Ensure get_plugin_data is available
