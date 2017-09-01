@@ -4,7 +4,7 @@
  *
  * @author  Seth Carstens
  * @package abtract-plugin-base
- * @version 2.5.0
+ * @version 2.5.1
  * @license GPL 2.0 - please retain comments that express original build of this file by the author.
  */
 
@@ -238,8 +238,8 @@ abstract class Abstract_Plugin {
 	protected function configure_defaults() {
 		$this->modules           = new \stdClass();
 		$this->modules->count    = 0;
-		$this->installed_dir     = dirname( static::$current_file, 1 );
-		$this->plugin_basedir    = dirname( static::$current_file, 2 );
+		$this->installed_dir     = static::dirname( static::$current_file, 1 );
+		$this->plugin_basedir    = static::dirname( static::$current_file, 2 );
 		$assumed_plugin_name     = basename( $this->plugin_basedir );
 		$this->plugin_file       = $this->plugin_basedir . '/' . $assumed_plugin_name . '.php';
 		$this->wp_plugin_slug    = $assumed_plugin_name . '/' . $assumed_plugin_name . '.php';
@@ -282,6 +282,22 @@ abstract class Abstract_Plugin {
 	 * @return mixed
 	 */
 	abstract protected function defines_and_globals();
+
+	/**
+	 * Dirname function that mimics PHP7 dirname() enhancements so that we can enable PHP5.6 support.
+	 *
+	 * @param     $path
+	 * @param int $count
+	 *
+	 * @return string
+	 */
+	public static function dirname($path, $count=1){
+		if ($count > 1){
+			return dirname(static::dirname($path, --$count));
+		}else{
+			return dirname($path);
+		}
+	}
 
 	/**
 	 * Utility function to get class name from filename if you follow this abstract plugin's naming standards

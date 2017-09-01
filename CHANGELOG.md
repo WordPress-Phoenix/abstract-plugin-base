@@ -1,3 +1,6 @@
+#### 2.5.2
+* Remove PHP7 function and replace with PHP5+ function for backwards compatibility.
+
 #### 2.5.1
 * Fix single site issue
 
