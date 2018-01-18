@@ -1,6 +1,7 @@
 # Abstract Plugin Base
 Used as a base class to help standardize the way we build WordPress plugins.
 
+CircleCI Build: [![CircleCI](https://circleci.com/gh/WordPress-Phoenix/wordpress-options-builder-class.svg?style=svg)](https://circleci.com/gh/WordPress-Phoenix/wordpress-options-builder-class)
 # WordPress Options Builder Class Library
 
 WordPress options builder class is a library that helps you setup theme or plugin options that store data in the database with just a line or two of code!
