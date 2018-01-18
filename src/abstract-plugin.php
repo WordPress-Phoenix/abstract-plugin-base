@@ -4,7 +4,7 @@
  *
  * @author  Seth Carstens
  * @package abtract-plugin-base
- * @version 2.5.1
+ * @version 2.5.3
  * @license GPL 2.0 - please retain comments that express original build of this file by the author.
  */
 
@@ -236,13 +236,13 @@ abstract class Abstract_Plugin {
 	 * Setup plugins global params.
 	 */
 	protected function configure_defaults() {
-		$this->modules           = new \stdClass();
-		$this->modules->count    = 0;
-		$this->installed_dir     = static::dirname( static::$current_file, 1 );
-		$this->plugin_basedir    = static::dirname( static::$current_file, 2 );
-		$assumed_plugin_name     = basename( $this->plugin_basedir );
-		$this->plugin_file       = $this->plugin_basedir . '/' . $assumed_plugin_name . '.php';
-		$this->wp_plugin_slug    = $assumed_plugin_name . '/' . $assumed_plugin_name . '.php';
+		$this->modules        = new \stdClass();
+		$this->modules->count = 0;
+		$this->installed_dir  = static::dirname( static::$current_file, 1 );
+		$this->plugin_basedir = static::dirname( static::$current_file, 2 );
+		$assumed_plugin_name  = basename( $this->plugin_basedir );
+		$this->plugin_file    = $this->plugin_basedir . '/' . $assumed_plugin_name . '.php';
+		$this->wp_plugin_slug = $assumed_plugin_name . '/' . $assumed_plugin_name . '.php';
 
 		if ( is_callable( 'is_plugin_active_for_network' ) ) {
 			$this->is_network_active = is_plugin_active_for_network( $this->wp_plugin_slug );
@@ -291,11 +291,11 @@ abstract class Abstract_Plugin {
 	 *
 	 * @return string
 	 */
-	public static function dirname($path, $count=1){
-		if ($count > 1){
-			return dirname(static::dirname($path, --$count));
-		}else{
-			return dirname($path);
+	public static function dirname( $path, $count = 1 ) {
+		if ( $count > 1 ) {
+			return dirname( static::dirname( $path, -- $count ) );
+		} else {
+			return dirname( $path );
 		}
 	}
 

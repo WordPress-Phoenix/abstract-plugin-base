@@ -1,3 +1,6 @@
+#### 2.5.3
+* Fix PHP CodeSniffer issues 
+
 #### 2.5.2
 * Remove PHP7 function and replace with PHP5+ function for backwards compatibility.
 
