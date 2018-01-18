@@ -10,11 +10,9 @@ jobs:
       - run: sudo chmod 777 -R ~
       - run: echo $PWD
       - run: ls -lart
-      - run: sudo pear install PHP_CodeSniffer
-      - run: composer require --dev --no-update "wp-coding-standards/wpcs"
-      - run: composer install --dev --no-autoloader
-      - run: sudo phpcs  --config-set installed_paths $PWD/vendor/wp-coding-standards/wpcs
-      - run: phpcs -p -s -v -n --standard=~/repo/.circleci/codesniffer.ruleset.xml .
+      - run: env COMPOSER=composer-test.json composer install --prefer-source --no-interaction
+      - run: sudo ./bin/phpcs --config-set installed_paths $(readlink -f vendor/wp-coding-standards/wpcs/)
+      - run: env COMPOSER=composer-test.json composer test
   notify:
     docker:
       - image: circleci/node:latest
