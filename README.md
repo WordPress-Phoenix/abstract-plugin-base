@@ -96,7 +96,7 @@ class App extends Abstract_Plugin {
         if ( is_user_logged_in() ) {
             // Ready for wp-admin - but not required 
             //require_once( $this->installed_dir . '/admin/class-admin-app.php' );
-            //$this->admin = new Admin/Admin_App( $this );
+            //$this->admin = new Admin/App( $this );
         }
     }
     
