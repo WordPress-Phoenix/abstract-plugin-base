@@ -4,7 +4,7 @@
  *
  * @author  Seth Carstens
  * @package abtract-plugin-base
- * @version 2.5.3
+ * @version 2.6.0
  * @license GPL 2.0 - please retain comments that express original build of this file by the author.
  */
 
@@ -13,7 +13,7 @@
  * Reference url https://wptavern.com/a-narrative-of-using-composer-in-a-wordpress-plugin
  */
 
-namespace WPAZ_Plugin_Base\V_2_5;
+namespace WPAZ_Plugin_Base\V_2_6;
 
 /**
  * Class Plugin_Base
@@ -152,15 +152,24 @@ abstract class Abstract_Plugin {
 	 * @var bool $is_network_active
 	 */
 	public $is_network_active = false;
+	
+	/**
+	 * First thing setup by class with provided namespace for use as prefix in WordPress hooks & actions
+	 * @var string
+	 */
+	public $wp_hook_pre = '';
 
 	/**
 	 * Construct the plugin object.
 	 * Note that classes that extend this class should add there construction actions into onload()
 	 */
 	public function __construct() {
+		
+		// setup hook prefix used to create unique actions/filters unique to this plugin
+		$this->wp_hook_pre = trim( strtolower( str_ireplace( '\\', '_', get_called_class() ) ) ) . '_';
 
 		// Hook can be used by mu plugins to modify plugin behavior after plugin is setup.
-		do_action( get_called_class() . '_preface', $this );
+		do_action( $this->wp_hook_pre . '_preface', $this );
 
 		// configure and setup the plugin class variables.
 		$this->configure_defaults();
@@ -183,7 +192,7 @@ abstract class Abstract_Plugin {
 		add_action( 'init', array( $this, 'authenticated_init' ) );
 
 		// Hook can be used by mu plugins to modify plugin behavior after plugin is setup.
-		do_action( get_called_class() . '_setup', $this );
+		do_action( $this->wp_hook_pre . '_setup', $this );
 
 	} // END public function __construct
 
