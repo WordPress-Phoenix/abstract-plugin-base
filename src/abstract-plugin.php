@@ -152,7 +152,7 @@ abstract class Abstract_Plugin {
 	 * @var bool $is_network_active
 	 */
 	public $is_network_active = false;
-	
+
 	/**
 	 * First thing setup by class with provided namespace for use as prefix in WordPress hooks & actions
 	 * @var string
