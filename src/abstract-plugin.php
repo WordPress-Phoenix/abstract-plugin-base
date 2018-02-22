@@ -164,7 +164,7 @@ abstract class Abstract_Plugin {
 	 * Note that classes that extend this class should add there construction actions into onload()
 	 */
 	public function __construct() {
-		
+
 		// setup hook prefix used to create unique actions/filters unique to this plugin
 		$this->wp_hook_pre = trim( strtolower( str_ireplace( '\\', '_', get_called_class() ) ) ) . '_';
 
