@@ -1,3 +1,6 @@
+#### 2.6.1
+* Hotfix namespace version to match minor version number update.
+
 #### 2.6.0
 * Adjusted default values for namespace depth, and autoload type to match generally accepted standard of 2 and psr-4 respectfully.
 * Fixed issue with plugin activated, deactived, and uninstalled hooks.

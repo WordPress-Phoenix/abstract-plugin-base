@@ -13,7 +13,7 @@
  * Reference url https://wptavern.com/a-narrative-of-using-composer-in-a-wordpress-plugin
  */
 
-namespace WPAZ_Plugin_Base\V_2_5;
+namespace WPAZ_Plugin_Base\V_2_6;
 
 /**
  * Class Plugin_Base
