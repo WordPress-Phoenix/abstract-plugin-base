@@ -197,7 +197,7 @@ abstract class Abstract_Plugin {
 			// (make available supporting utility classes used in ajax callback as well as callback registration)
 			add_action( 'init', array( $this, 'register_wp_ajax' ) );
 
-			// Register new authenticated WP Admin Ajax via add_action( 'wp_ajax_nopriv_*', ... ) on this hook
+			// Register new unauthenticated WP Admin Ajax via add_action( 'wp_ajax_nopriv_*', ... ) on this hook
 			// (make available supporting utility classes used in ajax callback as well as callback registration)
 			add_action( 'init', array( $this, 'register_wp_ajax_nopriv' ) );
 		}
