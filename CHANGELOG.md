@@ -1,5 +1,6 @@
 #### 2.6.1
 * Hotfix namespace version to match minor version number update.
+* Added $wp_hook_pre for better action prefixes
 
 #### 2.6.0
 * Adjusted default values for namespace depth, and autoload type to match generally accepted standard of 2 and psr-4 respectfully.
