@@ -4,7 +4,7 @@
  *
  * @author  Seth Carstens
  * @package abtract-plugin-base
- * @version 2.6.0
+ * @version 2.7.0
  * @license GPL 2.0 - please retain comments that express original build of this file by the author.
  */
 
@@ -13,7 +13,7 @@
  * Reference url https://wptavern.com/a-narrative-of-using-composer-in-a-wordpress-plugin
  */
 
-namespace WPAZ_Plugin_Base\V_2_6;
+namespace WPAZ_Plugin_Base\V_2_7;
 
 /**
  * Class Plugin_Base
@@ -185,11 +185,22 @@ abstract class Abstract_Plugin {
 		// Onload to do things during plugin construction.
 		$this->onload( $this );
 
-		// Most actions go into init which loads after WordPress core sets up all the defaults.
-		add_action( 'init', array( $this, 'init' ) );
+		// Only run plugin functionality outside admin ajax for efficiency and safety
+		if ( ! wp_doing_ajax() ) {
+			// Most actions go into init which loads after WordPress core sets up all the defaults.
+			add_action( 'init', array( $this, 'init' ) );
 
-		// Init for use with logged in users, see this::authenticated_init for more details.
-		add_action( 'init', array( $this, 'authenticated_init' ) );
+			// Init for use with logged in users, see this::authenticated_init for more details.
+			add_action( 'init', array( $this, 'authenticated_init' ) );
+		} else { // ... we're doing WordPress Admin Ajax
+			// Register new authenticated WP Admin Ajax via add_action( 'wp_ajax_*', ... ) on this hook
+			// (make available supporting utility classes used in ajax callback as well as callback registration)
+			add_action( 'init', array( $this, 'register_wp_ajax' ) );
+
+			// Register new authenticated WP Admin Ajax via add_action( 'wp_ajax_*', ... ) on this hook
+			// (make available supporting utility classes used in ajax callback as well as callback registration)
+			add_action( 'init', array( $this, 'register_wp_ajax_nopriv' ) );
+		}
 
 		// Hook can be used by mu plugins to modify plugin behavior after plugin is setup.
 		do_action( $this->wp_hook_pre . '_setup', $this );
@@ -377,6 +388,23 @@ abstract class Abstract_Plugin {
 	 * @return  void
 	 */
 	abstract public function init();
+
+	/**
+	 * Register all WP Admin Ajax functionality where WordPress has authenticated a user and the passed nonce can be
+	 * used to evaluate current_user_can() and make full use of WordPress connection.
+	 *
+	 * @return  void
+	 */
+	abstract public function register_wp_ajax();
+
+	/**
+	 * Register all WP Admin Ajax functionality where WordPress *did not* authenticate a user, but the creating
+	 * developer is choosing to explicitly allow front-end database access (used pre-WP-API for infinite scroll,
+	 * front-end ajax -- use WP-API wherever possible!)
+	 *
+	 * @return  void
+	 */
+	abstract public function register_wp_ajax_nopriv();
 
 	/**
 	 * Initialize the plugin - for public (front end)
