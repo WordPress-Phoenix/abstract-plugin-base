@@ -4,7 +4,7 @@
  *
  * @author  Seth Carstens
  * @package abtract-plugin-base
- * @version 2.5.3
+ * @version 2.6.0
  * @license GPL 2.0 - please retain comments that express original build of this file by the author.
  */
 
@@ -59,14 +59,14 @@ abstract class Abstract_Plugin {
 	 *
 	 * @var string $autoload_ns_match_depth more efficient when set to 2, when using package [ns_prefix]/[ns]
 	 */
-	public static $autoload_ns_match_depth = 1;
+	public static $autoload_ns_match_depth = 2;
 
 	/**
 	 * Autoload type can be classmap or psr-4
 	 *
 	 * @var string $autoload_dir classmap or psr-4 or false
 	 */
-	public static $autoload_type = 'classmap';
+	public static $autoload_type = 'psr-4';
 
 	/**
 	 * Magic constant trick that allows extended classes to pull actual server file location, copy into subclass.
@@ -433,11 +433,11 @@ abstract class Abstract_Plugin {
 			add_action( 'init', array( get_called_class(), 'load' ), 1 );
 		} else {
 			add_action( 'plugins_loaded', array( get_called_class(), 'load' ) );
-			// Installation and un-installation hooks.
-			register_activation_hook( $file, array( get_called_class(), 'activate' ) );
-			register_deactivation_hook( $file, array( get_called_class(), 'deactivate' ) );
-			register_uninstall_hook( $file, array( get_called_class(), 'uninstall' ) );
 		}
+		// Installation and un-installation hooks.
+		register_activation_hook( $file, array( get_called_class(), 'activate' ) );
+		register_deactivation_hook( $file, array( get_called_class(), 'deactivate' ) );
+		register_uninstall_hook( $file, array( get_called_class(), 'uninstall' ) );
 	}
 
 	/**
