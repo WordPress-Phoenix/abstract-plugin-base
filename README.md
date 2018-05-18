@@ -68,7 +68,7 @@ app/class-app.php
 ```php
 <?php
 namespace Custom\My_Plugin;
-use WPAZ_Plugin_Base\V_2_5\Abstract_Plugin;
+use WPAZ_Plugin_Base\V_2_6\Abstract_Plugin;
 
 /**
  * Class App
