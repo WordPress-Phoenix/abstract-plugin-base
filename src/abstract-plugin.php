@@ -248,8 +248,8 @@ abstract class Abstract_Plugin {
 	protected function configure_defaults() {
 		$this->modules        = new \stdClass();
 		$this->modules->count = 0;
-		$this->installed_dir  = static::dirname( static::$current_file, 1 );
-		$this->plugin_basedir = static::dirname( static::$current_file, 2 );
+		$this->installed_dir  = static::dirname( static::current_file(), 1 );
+		$this->plugin_basedir = static::dirname( static::current_file(), 2 );
 		$assumed_plugin_name  = basename( $this->plugin_basedir );
 		$this->plugin_file    = $this->plugin_basedir . '/' . $assumed_plugin_name . '.php';
 		$this->wp_plugin_slug = $assumed_plugin_name . '/' . $assumed_plugin_name . '.php';
@@ -267,7 +267,7 @@ abstract class Abstract_Plugin {
 				$this->version = $this->plugin_data['Version'];
 			}
 		} else {
-			$this->installed_url = plugins_url( '/', static::$current_file );
+			$this->installed_url = plugins_url( '/', static::current_file() );
 		}
 		// Setup network url and fallback in case siteurl is not defined.
 		if ( ! defined( 'WP_NETWORKURL' ) && is_multisite() ) {
@@ -276,6 +276,28 @@ abstract class Abstract_Plugin {
 			define( 'WP_NETWORKURL', get_site_url() );
 		}
 		$this->network_url = WP_NETWORKURL;
+	}
+
+	/**
+	 * Returns the namespace of the caller class (typically a child class)
+	 *
+	 * @return string
+	 */
+	protected static function autoload_class_prefix() {
+		$ref = new \ReflectionClass(static::class);
+
+		return $ref->getNamespaceName();
+	}
+
+	/**
+	 * Returns the file name of the caller class (typically a child class)
+	 *
+	 * @return string
+	 */
+	protected static function current_file() {
+		$ref = new \ReflectionClass(static::class);
+
+		return $ref->getFileName();
 	}
 
 	/**
@@ -417,7 +439,7 @@ abstract class Abstract_Plugin {
 		if ( stristr( $class, '\\' ) ) {
 
 			// If the first item is == the collection name, trim it off.
-			$class = str_ireplace( static::$autoload_class_prefix, '', $class );
+			$class = str_ireplace( static::autoload_class_prefix(), '', $class );
 
 			// Maybe fix formatting underscores to dashes and double to single slashes.
 			$class     = str_replace( [ '_', '\\' ], [ '-', '/' ], $class );
