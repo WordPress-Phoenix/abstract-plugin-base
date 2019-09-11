@@ -261,7 +261,7 @@ abstract class Abstract_Plugin {
 		if ( file_exists( $this->plugin_file ) ) {
 			$this->installed_url = plugins_url( '/', $this->plugin_file );
 			// Ensure get_plugin_data is available.
-			require_once( ABSPATH . 'wp-admin/includes/plugin.php' );
+			require_once ABSPATH . 'wp-admin/includes/plugin.php';
 			$this->plugin_data = get_plugin_data( $this->plugin_file, $markup = true, $translate = true );
 			if ( is_array( $this->plugin_data ) && isset( $this->plugin_data['Version'] ) ) {
 				$this->version = $this->plugin_data['Version'];
@@ -398,7 +398,7 @@ abstract class Abstract_Plugin {
 	 */
 	private function load_file( $path ) {
 		if ( $path && is_readable( $path ) ) {
-			include_once( $path );
+			include_once $path;
 			$success = true;
 		}
 
