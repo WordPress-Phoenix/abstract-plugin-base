@@ -37,4 +37,11 @@
 		<exclude-pattern>/lib/*</exclude-pattern>
 		<exclude-pattern>/src/*</exclude-pattern>
 	</rule>
+
+	<!-- Prevent empty lines at the start or end of control structures. -->
+	<rule ref="WordPress.WhiteSpace.ControlStructureSpacing">
+		<properties>
+			<property name="blank_line_check" value="true" />
+		</properties>
+	</rule>
 </ruleset>
